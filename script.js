@@ -10,8 +10,8 @@ const markdownToHTML = (text) => {
   return converter.makeHtml(text)
 }
 
-// AIzaSyC63lfuKqhYcl7PSUCI4DzY5TmXzBMKmns
-const perguntarAI = async (question, game, apiKey) => {
+
+const perguntarAI = async (question, game, apiKey, selectedPrompt) => {
   const model = "gemini-2.5-flash"
   const geminiURL = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
   const perguntaLOL = `
@@ -122,10 +122,22 @@ const perguntarAI = async (question, game, apiKey) => {
     Aqui está a pergunta do usuário: ${question}
   `
 
+  let prompt = ''
+  if (selectedPrompt === 'perguntaLOL') {
+    prompt = perguntaLOL
+  } else if (selectedPrompt === 'perguntaValorant') {
+    prompt = perguntaValorant
+  } else if (selectedPrompt === 'perguntaDestiny') {
+    prompt = perguntaDestiny
+  } else if (selectedPrompt === 'perguntaSable') {
+    prompt = perguntaSable
+  }
+  
+
   const contents = [{
     role: "user",
     parts: [{
-      text: perguntaLOL + perguntaValorant + perguntaDestiny + perguntaSable
+      text: prompt
     }]
   }]
 
@@ -183,7 +195,7 @@ let selectedPrompt = ''
   }
 
   try {
-    const text = await perguntarAI(question, game, apiKey)
+    const text = await perguntarAI(question, game, apiKey, selectedPrompt)
     aiResponse.querySelector('.response-content').innerHTML = markdownToHTML(text)
     aiResponse.classList.remove('hidden')
   } catch(error) {
